@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: data
+  namespace: gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ad/big-data-platform-envs.git
+    targetRevision: HEAD
+    path: environments/current/overlays/data
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: data
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -1,0 +1,20 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink
+  namespace: gitops
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/ad/big-data-platform-envs.git
+    targetRevision: HEAD
+    path: environments/current/overlays/flink
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flink
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

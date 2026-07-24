@@ -1,0 +1,13 @@
+# Secrets
+*.sops.yaml
+.agekey
+age.key
+
+# Velero
+velero-*.tar.gz
+
+# ArgoCD
+argocd/
+
+# Kubernetes
+*.kubeconfig
