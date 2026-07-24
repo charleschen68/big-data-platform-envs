@@ -1,0 +1,32 @@
+backupLocation:
+  name: minio
+  config:
+    region: minio
+    s3ForcePathStyle: "true"
+    s3Url: http://minio.data.svc.cluster.local:9000
+
+credentials:
+  useSecret: true
+  existingSecret: minio-velero-credentials
+
+schedules:
+  daily-backup:
+    disabled: false
+    schedule: "0 3 * * *"
+    template:
+      ttl: "720h"
+      includeNamespaces:
+        - data
+        - flink
+        - collectors
+        - observability
+        - gitops
+      storageLocation: minio
+
+volumeSnapshotLocations:
+  - name: minio
+    provider: aws
+    config:
+      region: minio
+      s3ForcePathStyle: "true"
+      s3Url: http://minio.data.svc.cluster.local:9000
