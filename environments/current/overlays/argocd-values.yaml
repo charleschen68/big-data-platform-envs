@@ -1,0 +1,26 @@
+controller:
+  replicas: 1
+  logs:
+    level: info
+
+server:
+  ingress:
+    enabled: false
+  service:
+    type: ClusterIP
+
+repoServer:
+  replicas: 1
+
+configs:
+  params:
+    server.insecure: false
+    controller.processors.workflows: 10
+    controller.processors.status.status: 10
+
+applicationSet:
+  replicas: 1
+
+crds:
+  install: true
+  keep: true
