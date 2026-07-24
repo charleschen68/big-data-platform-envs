@@ -35,6 +35,56 @@ GitOps environment repository for big-data-platform.
 - Restore entire cluster from Velero backup
 - Verify PVC recovery, etcd recovery, ArgoCD sync, full system availability
 
+## Quick Start — Run the Cluster
+
+### Prerequisites
+
+- k3s (or any Kubernetes 1.28+)
+- kubectl
+- sops + age (for encrypted secrets)
+- Git
+
+### One-command setup
+
+```bash
+# 1. Install k3s (if not already running)
+curl -sfL https://get.k3s.io | sh
+
+# 2. Clone this repo
+git clone https://github.com/ad/big-data-platform-envs.git
+cd big-data-platform-envs
+
+# 3. Apply all configurations
+kubectl apply -f environments/current/
+
+# 4. Verify
+kubectl get pods -A
+kubectl get applications -n gitops
+```
+
+### What gets deployed
+
+| Namespace | Components |
+|-----------|-----------|
+| `gitops` | ArgoCD (server, controller, repo-server, applicationset, dex, redis) |
+| `data` | Kafka, MySQL, MinIO, ClickHouse, Milvus, Velero |
+| `flink` | Flink Operator |
+| `collectors` | RSS Collector, Settlement Worker, Market Collector |
+| `observability` | Prometheus, Grafana, Alertmanager |
+
+### Check it's running
+
+```bash
+# All pods should be Running (or Completed)
+kubectl get pods -A
+
+# ArgoCD Applications should be Synced
+kubectl get applications -n gitops
+
+# All namespaces should exist
+kubectl get namespaces | grep -E 'gitops|data|flink|collectors|observability'
+```
+
 ## Usage
 
 ```bash
