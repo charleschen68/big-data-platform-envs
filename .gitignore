@@ -11,3 +11,6 @@ argocd/
 
 # Kubernetes
 *.kubeconfig
+
+# Local Git worktrees
+.worktrees/
