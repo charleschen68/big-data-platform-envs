@@ -33,3 +33,14 @@ No plaintext secrets, credentials, tokens, or keys may be committed, rendered
 into manifests, copied into logs, or documented in this repository.
 
 > 严禁以明文形式提交、记录或复制密码、令牌、密钥等敏感信息。
+
+## Documentation validation
+
+Before requesting review, run the scoped checks below. Replace template labels
+in `design/README.md` with concrete content in every actual design record.
+
+```bash
+rg -n 'TODO|TBD|FIXME' Instructions.md design wiki standards
+git diff --check
+git status --short
+```
