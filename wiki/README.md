@@ -21,3 +21,7 @@ backup condition, and verification before execution. Never instruct an operator
 to expose plaintext secrets.
 
 > 运维手册必须明确前提条件、权限、影响、验证和回滚或升级路径。
+
+## Current runbooks
+
+- [GitOps data and collectors operating runbook](2026-08-05-gitops-data-collectors-runbook.md)

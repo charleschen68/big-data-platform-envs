@@ -1,6 +1,6 @@
 # GitOps migration for data services, collectors, and local observability
 
-**Status:** approved
+**Status:** applied and validated locally
 **Owner:** platform owner
 **Decision date:** 2026-08-05
 
@@ -13,11 +13,10 @@ Dockerfiles, and the collector image build/import script. Its existing
 an ongoing deployment source.
 
 The target OrbStack Kubernetes cluster is a single node with approximately
-15.7 GiB allocatable memory. It currently has no Ingress controller, Argo CD,
-Strimzi CRDs, or platform namespaces. Existing environment Application CRs
-refer to overlays that do not yet exist. The source manifests also contain
-plaintext credentials, assume locally imported collector images, and require
-the Strimzi operator before Kafka resources can be reconciled.
+15.7 GiB allocatable memory. Before this migration it had no Ingress
+controller, Argo CD, Strimzi CRDs, or platform namespaces. The source manifests
+contained plaintext credentials, assumed locally imported collector images, and
+required the Strimzi operator before Kafka resources could be reconciled.
 
 ## Goals and non-goals
 
@@ -103,7 +102,12 @@ The data Application ignores only Argo CD's own tracking annotation on
 StatefulSets. This compensates for an SSA comparison artifact without masking
 workload specification, image, resource, or PVC drift. Its
 `RespectIgnoreDifferences` sync option makes that same narrow rule effective
-during server-side apply.
+during server-side apply. Argo CD 3.5 did not apply either application-level
+or system-level ignore normalizers to this tracking comparison in the tested
+path. Therefore MySQL and ClickHouse explicitly declare their stable
+`data:apps/StatefulSet:data/<name>` tracking IDs. Renaming the `data`
+Application or either StatefulSet requires updating this ownership metadata in
+the same reviewed change.
 
 The existing `flink` Application is excluded from the root composition during
 this migration because its overlay does not exist and Flink is outside the
@@ -247,11 +251,23 @@ check collector logs and Kafka consumer groups.
 7. Confirm collector readiness, logs, consumer-group positions, and Grafana
    metrics before declaring ingestion started.
 
-## Open decisions
+## Applied evidence and remaining boundaries
 
-- Pin exact Helm chart versions and image digests after retrieving the current
-  compatible chart metadata during implementation.
-- Set final data-service resource requests after rendering and evaluating the
-  node scheduling budget.
-- Determine whether an existing persistent data set requires a separate
-  stateful cutover plan before the `data` Application is first synced.
+On 2026-08-05, the local OrbStack rollout validated ready Kafka, MySQL,
+ClickHouse, MinIO, Milvus, three collector Deployments, Prometheus, and
+Grafana. Prometheus discovered three collector metric targets; the live query
+`count(collector_ready{namespace="collectors"})` returned `3` and the Grafana
+dashboard endpoint returned the `Collector Runtime` dashboard. Both local
+Ingress routes returned HTTP 200.
+
+The safe schema-init Job created and loaded the missing
+`eth_sentiment_analysis` collection without dropping an existing collection.
+The retraining smoke Job correctly declined retraining because it found zero
+samples, which verified the persistent artifact claim without training or
+overwriting a model.
+
+This is not a production HA, backup, TLS, external authentication, Flink, or
+Kafka-lag monitoring design. Container CPU and memory panels are conditional:
+this local kubelet did not expose cAdvisor container series. Any stateful data
+cutover, production exposure, or image-registry supply-chain change requires a
+separate reviewed design.

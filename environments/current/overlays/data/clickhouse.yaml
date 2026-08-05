@@ -2,6 +2,8 @@ apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: clickhouse
+  annotations:
+    argocd.argoproj.io/tracking-id: data:apps/StatefulSet:data/clickhouse
 spec:
   serviceName: clickhouse
   replicas: 1
