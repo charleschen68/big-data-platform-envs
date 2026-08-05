@@ -101,7 +101,9 @@ the non-stateful controllers and prerequisite applications.
 
 The data Application ignores only Argo CD's own tracking annotation on
 StatefulSets. This compensates for an SSA comparison artifact without masking
-workload specification, image, resource, or PVC drift.
+workload specification, image, resource, or PVC drift. Its
+`RespectIgnoreDifferences` sync option makes that same narrow rule effective
+during server-side apply.
 
 The existing `flink` Application is excluded from the root composition during
 this migration because its overlay does not exist and Flink is outside the
