@@ -1,0 +1,41 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: rss-collector-metrics
+  labels:
+    metrics: collector-runtime
+spec:
+  selector:
+    app: rss-collector
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: health
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: market-collector-metrics
+  labels:
+    metrics: collector-runtime
+spec:
+  selector:
+    app: market-collector
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: health
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: settlement-worker-metrics
+  labels:
+    metrics: collector-runtime
+spec:
+  selector:
+    app: settlement-worker
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: health

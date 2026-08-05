@@ -32,7 +32,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: rss-collector
-          image: big-data/rss-collector:phase2
+          image: big-data/rss-collector:git-6a41c69
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -80,7 +80,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: market-collector
-          image: big-data/market-collector:phase2
+          image: big-data/market-collector:git-6a41c69
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -134,7 +134,7 @@ spec:
           type: RuntimeDefault
       containers:
         - name: settlement-worker
-          image: big-data/settlement-worker:phase2
+          image: big-data/settlement-worker:git-6a41c69
           imagePullPolicy: Never
           envFrom:
             - configMapRef:
@@ -221,7 +221,7 @@ spec:
               type: RuntimeDefault
           containers:
             - name: model-retrain
-              image: big-data/model-retrain:phase2
+              image: big-data/model-retrain:git-6a41c69
               imagePullPolicy: Never
               envFrom:
                 - configMapRef:

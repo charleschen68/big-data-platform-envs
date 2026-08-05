@@ -166,7 +166,8 @@ rollout verifies scheduled Pod requests before each subsequent wave. This is
 not HA: loss of the node interrupts every component.
 
 The initial local profile reserves 512Mi for MinIO, 1Gi for the dual-role
-Kafka node, 512Mi for MySQL, 2Gi for ClickHouse, and 2Gi for Milvus. Kafka
+Kafka node, 512Mi for MySQL, 2Gi for ClickHouse, 2Gi for Milvus, 512Mi for
+Prometheus, 256Mi for the Prometheus Operator, and 192Mi for Grafana. Kafka
 uses one KRaft `KafkaNodePool` replica with a 20Gi `local-path` claim and
 `deleteClaim: false`. Strimzi owns broker IDs, KRaft roles, listener protocol
 mapping, and generated bootstrap Services; hand-written `KAFKA_*` broker
@@ -209,12 +210,23 @@ migration.
 
 ## Observability
 
-Argo CD is the deployment-health source. Grafana provides collector availability,
-restart count, CPU and memory usage, Kafka broker health, consumer lag, and
-collector error-rate views. A ServiceMonitor or equivalent scrape declaration
-is required for each collector health/metrics endpoint. Dashboards alone do not
-prove end-to-end ingestion: rollout evidence must also check collector logs and
-Kafka consumer groups.
+Argo CD is the deployment-health source. Each collector exposes Prometheus text
+metrics at `/metrics`: `collector_ready`, `collector_stale`, and
+`collector_heartbeat_age_seconds`. The environment declares one metrics Service
+per collector and a cross-namespace ServiceMonitor. Grafana's local-only
+`Collector Runtime` dashboard shows those signals plus Pod CPU and working-set
+memory where kubelet cAdvisor metrics are available.
+
+Grafana is anonymous **Viewer** only because `grafana.localhost` is explicitly
+local to the OrbStack host. This is not an authentication design for a shared
+or remotely reachable cluster. The minimal local stack disables Alertmanager,
+node-exporter, default rule packs, and control-plane scrapes that are not
+available in this environment; Prometheus retains two days of data without a
+PVC. It does not yet provide domain error-rate or Kafka-lag metrics because the
+collector processes do not emit them and no Kafka exporter is declared.
+
+Dashboards alone do not prove end-to-end ingestion: rollout evidence must also
+check collector logs and Kafka consumer groups.
 
 ## Validation plan
 

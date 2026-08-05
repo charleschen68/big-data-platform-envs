@@ -5,9 +5,12 @@ resources:
   - applications/gitops.yaml
   - projects/platform.yaml
   - applications/ingress.yaml
+  - applications/argocd-ui.yaml
   - applications/secrets.yaml
   - applications/collector-secrets.yaml
   - applications/data-prerequisites.yaml
   - applications/strimzi.yaml
   - applications/data.yaml
   - applications/collectors.yaml
+  - applications/monitoring.yaml
+  - applications/observability.yaml

@@ -1,0 +1,15 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: collector-runtime
+  namespace: collectors
+  labels:
+    monitoring: collector-runtime
+spec:
+  selector:
+    matchLabels:
+      metrics: collector-runtime
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: 30s

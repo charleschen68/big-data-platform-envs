@@ -4,4 +4,5 @@ namespace: collectors
 resources:
   - configmap.yaml
   - external-services.yaml
+  - metrics-services.yaml
   - workloads.yaml

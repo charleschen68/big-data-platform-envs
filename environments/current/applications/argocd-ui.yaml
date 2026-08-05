@@ -1,19 +1,19 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: ingress
+  name: argocd-ui
   namespace: gitops
   annotations:
-    argocd.argoproj.io/sync-wave: "-30"
+    argocd.argoproj.io/sync-wave: "-25"
 spec:
   project: platform
   source:
     repoURL: https://github.com/charleschen68/big-data-platform-envs.git
     targetRevision: feat/gitops-data-collectors
-    path: environments/current/overlays/ingress
+    path: environments/current/overlays/argocd-ui
   destination:
     server: https://kubernetes.default.svc
-    namespace: ingress
+    namespace: gitops
   syncPolicy:
     automated:
       prune: true

@@ -1,0 +1,49 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: collector-runtime-dashboard
+  namespace: observability
+  labels:
+    grafana_dashboard: "1"
+data:
+  collector-runtime.json: |
+    {
+      "title": "Collector Runtime",
+      "uid": "collector-runtime",
+      "timezone": "browser",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "30s",
+      "panels": [
+        {
+          "type": "stat",
+          "title": "Ready collector targets",
+          "targets": [{"expr": "sum(collector_ready{namespace=\"collectors\"})", "refId": "A"}],
+          "gridPos": {"h": 8, "w": 6, "x": 0, "y": 0}
+        },
+        {
+          "type": "stat",
+          "title": "Stale collector targets",
+          "targets": [{"expr": "sum(collector_stale{namespace=\"collectors\"})", "refId": "A"}],
+          "gridPos": {"h": 8, "w": 6, "x": 6, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Heartbeat age",
+          "targets": [{"expr": "collector_heartbeat_age_seconds{namespace=\"collectors\"}", "legendFormat": "{{service}} / {{pod}}", "refId": "A"}],
+          "gridPos": {"h": 8, "w": 12, "x": 12, "y": 0}
+        },
+        {
+          "type": "timeseries",
+          "title": "Collector CPU cores",
+          "targets": [{"expr": "sum by (pod) (rate(container_cpu_usage_seconds_total{namespace=\"collectors\",container!=\"\",container!=\"POD\"}[5m]))", "legendFormat": "{{pod}}", "refId": "A"}],
+          "gridPos": {"h": 9, "w": 12, "x": 0, "y": 8}
+        },
+        {
+          "type": "timeseries",
+          "title": "Collector working-set memory",
+          "targets": [{"expr": "sum by (pod) (container_memory_working_set_bytes{namespace=\"collectors\",container!=\"\",container!=\"POD\"})", "legendFormat": "{{pod}}", "refId": "A"}],
+          "gridPos": {"h": 9, "w": 12, "x": 12, "y": 8}
+        }
+      ]
+    }
