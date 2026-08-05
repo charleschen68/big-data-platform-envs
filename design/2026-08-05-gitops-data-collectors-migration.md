@@ -118,6 +118,9 @@ Milvus 2.4 reads the MinIO identity from `MINIO_ACCESS_KEY_ID` and
 `MINIO_SECRET_ACCESS_KEY`. The obsolete `MINIO_ACCESS_KEY` and
 `MINIO_SECRET_KEY` names are not used because they silently fall back to the
 image defaults. Milvus probes `/healthz` before it is treated as ready.
+Because standalone Milvus embeds etcd and mounts RWO claims, its single-replica
+Deployment uses the `Recreate` strategy. A rolling surge could mount the same
+embedded-etcd data volume into old and new Pods concurrently.
 
 The upstream KSOPS image does not include the `sops` executable. The local
 bootstrap builds the pinned ARM64 `big-data-platform/argocd-ksops-sops` CMP
