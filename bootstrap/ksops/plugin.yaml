@@ -7,4 +7,4 @@ spec:
     find:
       command: [sh, -c, "test -f ksops-generator.yaml"]
   generate:
-    command: [sh, -c, "kustomize build --enable-alpha-plugins --enable-exec ."]
+    command: [ksops, ksops-generator.yaml]

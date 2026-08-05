@@ -6,17 +6,6 @@ configs:
     server.insecure: true
 repoServer:
   replicas: 1
-  initContainers:
-    - name: install-ksops
-      image: viaductoss/ksops:v4.5.1
-      command: [sh, -c]
-      args:
-        - >-
-          install -Dm755 /usr/local/bin/ksops /custom-tools/ksops &&
-          install -Dm755 /usr/local/bin/kustomize /custom-tools/kustomize
-      volumeMounts:
-        - name: custom-tools
-          mountPath: /custom-tools
   extraContainers:
     - name: cmp-ksops
       image: viaductoss/ksops:v4.5.1
@@ -38,8 +27,6 @@ repoServer:
           mountPath: /home/argocd/.config/sops/age
           readOnly: true
   volumes:
-    - name: custom-tools
-      emptyDir: {}
     - name: cmp-ksops
       configMap:
         name: argocd-cmp-ksops
@@ -48,16 +35,6 @@ repoServer:
     - name: sops-age
       secret:
         secretName: argocd-sops-age
-  volumeMounts:
-    - name: custom-tools
-      mountPath: /usr/local/bin/ksops
-      subPath: ksops
-    - name: custom-tools
-      mountPath: /usr/local/bin/kustomize
-      subPath: kustomize
-    - name: sops-age
-      mountPath: /home/argocd/.config/sops/age
-      readOnly: true
 server:
   replicas: 1
   service:

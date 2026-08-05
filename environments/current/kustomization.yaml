@@ -5,8 +5,8 @@ resources:
   - applications/gitops.yaml
   - projects/platform.yaml
   - applications/ingress.yaml
+  - applications/secrets.yaml
   - applications/data-prerequisites.yaml
   - applications/data.yaml
   - applications/collectors.yaml
   - applications/observability.yaml
-  - secrets
