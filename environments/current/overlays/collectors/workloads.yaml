@@ -160,6 +160,44 @@ spec:
           emptyDir: {}
 ---
 apiVersion: batch/v1
+kind: Job
+metadata:
+  name: milvus-schema-init
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
+spec:
+  backoffLimit: 2
+  activeDeadlineSeconds: 300
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: milvus-schema-init
+          image: big-data/milvus-schema-init:phase2
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: collector-config
+          resources:
+            requests: {cpu: 50m, memory: 128Mi}
+            limits: {cpu: 250m, memory: 256Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - name: tmp
+              mountPath: /tmp
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: batch/v1
 kind: CronJob
 metadata:
   name: model-retrain

@@ -184,8 +184,13 @@ The stable internal DNS interfaces are:
 
 Collectors receive these dependencies through namespaced service aliases and
 use the existing `rss-collector`, `market-collector`, `settlement-worker`, and
-`model-retrain` workload names. Kafka topic, consumer-group, schema, and
-idempotency behavior are unchanged by this manifest migration.
+`model-retrain` workload names. A `milvus-schema-init` Job runs in an earlier
+sync wave. It can create the missing `eth_sentiment_analysis` collection, its
+COSINE `IVF_FLAT` vector index, and load the collection; it refuses to mutate
+an existing collection. Schema replacement is therefore an explicitly reviewed
+application migration, never an Argo CD reconciliation side effect. Kafka
+topic, consumer-group, and idempotency behavior are unchanged by this manifest
+migration.
 
 ## Failure and rollback behavior
 
@@ -196,7 +201,9 @@ idempotency behavior are unchanged by this manifest migration.
   commit. Do not force sync past a failed dependency.
 - Failed collector rollout: scale or revert only the failing collector
   Deployment; retain data services and capture logs, readiness output, and
-  Kafka consumer-group evidence.
+  Kafka consumer-group evidence. A failed `milvus-schema-init` Job must not be
+  retried by deleting or replacing an existing collection; inspect its schema
+  and use a separately reviewed migration.
 - Stateful data migration is not in scope. Existing state is neither adopted
   nor destroyed without an explicit owner-approved cutover and recovery plan.
 
