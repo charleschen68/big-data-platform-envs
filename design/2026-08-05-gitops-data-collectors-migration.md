@@ -105,6 +105,11 @@ explicitly declare their stable
 Application or either StatefulSet requires updating this ownership metadata in
 the same reviewed change.
 
+The `data` Application does not enable `ServerSideApply`. Argo CD has a known
+false-drift behavior for StatefulSets with `volumeClaimTemplates` when that
+option is set, and this application has two such stateful services. Other
+Applications retain their independently justified sync options.
+
 The existing `flink` Application is excluded from the root composition during
 this migration because its overlay does not exist and Flink is outside the
 approved scope. The file may remain as a future migration input, but Argo CD
