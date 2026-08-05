@@ -98,13 +98,9 @@ Their initial synchronization is an explicit operator action after the preceding
 application is `Synced` and `Healthy`. Automated reconciliation is retained for
 the non-stateful controllers and prerequisite applications.
 
-The data Application ignores only Argo CD's own tracking annotation on
-StatefulSets. This compensates for an SSA comparison artifact without masking
-workload specification, image, resource, or PVC drift. Its
-`RespectIgnoreDifferences` sync option makes that same narrow rule effective
-during server-side apply. Argo CD 3.5 did not apply either application-level
-or system-level ignore normalizers to this tracking comparison in the tested
-path. Therefore MySQL and ClickHouse explicitly declare their stable
+Argo CD 3.5 did not apply application-level or system-level ignore normalizers
+to this tracking comparison in the tested path. Therefore MySQL and ClickHouse
+explicitly declare their stable
 `data:apps/StatefulSet:data/<name>` tracking IDs. Renaming the `data`
 Application or either StatefulSet requires updating this ownership metadata in
 the same reviewed change.

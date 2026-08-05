@@ -7,13 +7,6 @@ metadata:
     argocd.argoproj.io/sync-wave: "-10"
 spec:
   project: platform
-  ignoreDifferences:
-    - group: apps
-      kind: StatefulSet
-      jsonPointers:
-        - /metadata/annotations/argocd.argoproj.io~1tracking-id
-      jqPathExpressions:
-        - .metadata.annotations."argocd.argoproj.io/tracking-id"
   source:
     repoURL: https://github.com/charleschen68/big-data-platform-envs.git
     targetRevision: feat/gitops-data-collectors
@@ -24,5 +17,4 @@ spec:
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
-      - RespectIgnoreDifferences=true
       - ServerSideApply=true
