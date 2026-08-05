@@ -12,6 +12,8 @@ spec:
       kind: StatefulSet
       jsonPointers:
         - /metadata/annotations/argocd.argoproj.io~1tracking-id
+      jqPathExpressions:
+        - .metadata.annotations."argocd.argoproj.io/tracking-id"
   source:
     repoURL: https://github.com/charleschen68/big-data-platform-envs.git
     targetRevision: feat/gitops-data-collectors
