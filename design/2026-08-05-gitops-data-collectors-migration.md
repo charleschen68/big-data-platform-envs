@@ -114,6 +114,11 @@ Naming is standardized so MySQL and collector workloads reference the same
 explicitly documented credential contract. Plaintext source manifests are not
 copied.
 
+Milvus 2.4 reads the MinIO identity from `MINIO_ACCESS_KEY_ID` and
+`MINIO_SECRET_ACCESS_KEY`. The obsolete `MINIO_ACCESS_KEY` and
+`MINIO_SECRET_KEY` names are not used because they silently fall back to the
+image defaults. Milvus probes `/healthz` before it is treated as ready.
+
 The upstream KSOPS image does not include the `sops` executable. The local
 bootstrap builds the pinned ARM64 `big-data-platform/argocd-ksops-sops` CMP
 image from the upstream KSOPS image and an SHA-256-verified SOPS release. The
