@@ -7,16 +7,22 @@ metadata:
     argocd.argoproj.io/sync-wave: "-20"
 spec:
   project: platform
-  sources:
-    - repoURL: https://charts.min.io/
-      chart: minio
-      targetRevision: 5.4.0
-      helm:
-        valueFiles:
-          - $values/environments/current/overlays/data-prerequisites/minio-values.yaml
-    - repoURL: https://github.com/charleschen68/big-data-platform-envs.git
-      targetRevision: HEAD
-      ref: values
+  source:
+    repoURL: https://charts.min.io/
+    chart: minio
+    targetRevision: 5.4.0
+    helm:
+      parameters:
+        - name: mode
+          value: standalone
+        - name: existingSecret
+          value: minio-secrets
+        - name: persistence.enabled
+          value: "true"
+        - name: persistence.storageClass
+          value: local-path
+        - name: persistence.size
+          value: 20Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: data
