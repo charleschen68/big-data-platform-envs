@@ -2,6 +2,9 @@ configs:
   cm:
     exec.enabled: false
     kustomize.buildOptions: --enable-alpha-plugins --enable-exec
+    resource.customizations.ignoreDifferences.apps_StatefulSet: |
+      jsonPointers:
+        - /metadata/annotations/argocd.argoproj.io~1tracking-id
   params:
     server.insecure: true
 repoServer:

@@ -33,4 +33,6 @@ helm upgrade --install argocd argo/argo-cd \
 
 kubectl --context "${context}" wait --for=condition=Established \
   crd/applications.argoproj.io --timeout=5m
+kubectl --context "${context}" apply \
+  -f "${repo_root}/environments/current/projects/platform.yaml"
 kubectl --context "${context}" apply -f "${repo_root}/environments/current/applications/gitops.yaml"
