@@ -110,6 +110,13 @@ false-drift behavior for StatefulSets with `volumeClaimTemplates` when that
 option is set, and this application has two such stateful services. Other
 Applications retain their independently justified sync options.
 
+The `data` Application enables the Argo CD `ServerSideDiff` comparison option
+only. This is a Beta comparison strategy, not Server-Side Apply: it uses a
+Kubernetes server-side dry-run to compare the desired manifest with the live
+resource. It is intentionally scoped to this Application because both
+StatefulSets produced no normalized server-side diff while Argo CD's legacy
+comparator reported them out of sync.
+
 The existing `flink` Application is excluded from the root composition during
 this migration because its overlay does not exist and Flink is outside the
 approved scope. The file may remain as a future migration input, but Argo CD
