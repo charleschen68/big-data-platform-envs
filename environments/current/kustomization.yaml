@@ -9,4 +9,3 @@ resources:
   - applications/data-prerequisites.yaml
   - applications/data.yaml
   - applications/collectors.yaml
-  - applications/observability.yaml

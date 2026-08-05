@@ -6,6 +6,8 @@ metadata:
 spec:
   sourceRepos:
     - https://github.com/charleschen68/big-data-platform-envs.git
+    - https://charts.min.io/
+    - https://strimzi.io/charts/
   destinations:
     - namespace: gitops
       server: https://kubernetes.default.svc

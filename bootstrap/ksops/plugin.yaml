@@ -4,7 +4,6 @@ metadata:
   name: ksops
 spec:
   discover:
-    find:
-      command: [sh, -c, "test -f ksops-generator.yaml"]
+    fileName: ksops-generator.yaml
   generate:
     command: [ksops, ksops-generator.yaml]

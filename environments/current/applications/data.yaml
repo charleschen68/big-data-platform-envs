@@ -9,7 +9,7 @@ spec:
   project: platform
   source:
     repoURL: https://github.com/charleschen68/big-data-platform-envs.git
-    targetRevision: HEAD
+    targetRevision: feat/gitops-data-collectors
     path: environments/current/overlays/data
   destination:
     server: https://kubernetes.default.svc
