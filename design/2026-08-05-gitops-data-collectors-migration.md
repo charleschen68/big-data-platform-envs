@@ -225,6 +225,10 @@ available in this environment; Prometheus retains two days of data without a
 PVC. It does not yet provide domain error-rate or Kafka-lag metrics because the
 collector processes do not emit them and no Kafka exporter is declared.
 
+The AppProject permits only the Prometheus Operator's two admission webhook
+configuration kinds in addition to the existing namespace, CRD, and RBAC
+cluster resources. It does not use a cluster-resource wildcard.
+
 Dashboards alone do not prove end-to-end ingestion: rollout evidence must also
 check collector logs and Kafka consumer groups.
 
