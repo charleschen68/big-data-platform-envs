@@ -8,6 +8,9 @@ velero-*.tar.gz
 
 # ArgoCD
 argocd/
+!bootstrap/
+!bootstrap/argocd/
+!bootstrap/argocd/values.yaml
 
 # Kubernetes
 *.kubeconfig

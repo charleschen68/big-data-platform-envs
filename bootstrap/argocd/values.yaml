@@ -1,0 +1,64 @@
+configs:
+  cm:
+    exec.enabled: false
+    kustomize.buildOptions: --enable-alpha-plugins --enable-exec
+  params:
+    server.insecure: true
+repoServer:
+  replicas: 1
+  initContainers:
+    - name: install-ksops
+      image: viaductoss/ksops:v4.5.1
+      command: [sh, -c]
+      args:
+        - >-
+          install -Dm755 /usr/local/bin/ksops /custom-tools/ksops &&
+          install -Dm755 /usr/local/bin/kustomize /custom-tools/kustomize
+      volumeMounts:
+        - name: custom-tools
+          mountPath: /custom-tools
+  extraContainers:
+    - name: cmp-ksops
+      image: viaductoss/ksops:v4.5.1
+      command: [/var/run/argocd/argocd-cmp-server]
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      volumeMounts:
+        - name: var-files
+          mountPath: /var/run/argocd
+        - name: plugins
+          mountPath: /home/argocd/cmp-server/plugins
+        - name: cmp-ksops
+          mountPath: /home/argocd/cmp-server/config/plugin.yaml
+          subPath: plugin.yaml
+        - name: cmp-tmp
+          mountPath: /tmp
+        - name: sops-age
+          mountPath: /home/argocd/.config/sops/age
+          readOnly: true
+  volumes:
+    - name: custom-tools
+      emptyDir: {}
+    - name: cmp-ksops
+      configMap:
+        name: argocd-cmp-ksops
+    - name: cmp-tmp
+      emptyDir: {}
+    - name: sops-age
+      secret:
+        secretName: argocd-sops-age
+  volumeMounts:
+    - name: custom-tools
+      mountPath: /usr/local/bin/ksops
+      subPath: ksops
+    - name: custom-tools
+      mountPath: /usr/local/bin/kustomize
+      subPath: kustomize
+    - name: sops-age
+      mountPath: /home/argocd/.config/sops/age
+      readOnly: true
+server:
+  replicas: 1
+  service:
+    type: ClusterIP
