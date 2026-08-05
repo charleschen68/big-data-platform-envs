@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: collector-config
+data:
+  KAFKA_BOOTSTRAP_SERVERS: kafka:9092
+  RSS_TOPIC: eth_social_stream
+  RSS_CHECK_INTERVAL_SECONDS: "60"
+  RSS_FEEDS: https://cointelegraph.com/rss,https://www.coindesk.com/arc/outboundfeeds/rss/,https://decrypt.co/feed
+  MYSQL_HOST: mysql
+  MYSQL_DATABASE: trade
+  MARKET_INTERVAL_SECONDS: "60"
+  MILVUS_HOST: milvus
+  MILVUS_PORT: "19530"
+  MILVUS_COLLECTION: eth_sentiment_analysis
+  TRADE_SIGNALS_TOPIC: topic_trade_signals
+  HEALTH_PORT: "8080"
+  HEALTH_STALE_AFTER_SECONDS: "180"

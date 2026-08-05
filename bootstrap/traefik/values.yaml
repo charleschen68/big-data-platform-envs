@@ -1,0 +1,22 @@
+deployment:
+  replicas: 1
+service:
+  spec:
+    type: LoadBalancer
+resources:
+  requests:
+    cpu: 50m
+    memory: 64Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+ingressClass:
+  enabled: true
+  isDefaultClass: true
+ports:
+  traefik:
+    expose:
+      default: false
+  web:
+    expose:
+      default: true

@@ -3,12 +3,16 @@ kind: Application
 metadata:
   name: gitops-self
   namespace: gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-40"
 spec:
-  project: default
+  project: platform
   source:
-    repoURL: https://github.com/ad/big-data-platform-envs.git
+    repoURL: https://github.com/charleschen68/big-data-platform-envs.git
     targetRevision: HEAD
     path: environments/current
+    plugin:
+      name: ksops
   destination:
     server: https://kubernetes.default.svc
     namespace: gitops
@@ -18,3 +22,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

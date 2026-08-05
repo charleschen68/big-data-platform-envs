@@ -1,0 +1,10 @@
+apiVersion: argoproj.io/v1alpha1
+kind: ConfigManagementPlugin
+metadata:
+  name: ksops
+spec:
+  discover:
+    find:
+      command: [sh, -c, "test -f ksops-generator.yaml"]
+  generate:
+    command: [sh, -c, "kustomize build --enable-alpha-plugins --enable-exec ."]

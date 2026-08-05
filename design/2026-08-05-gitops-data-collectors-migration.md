@@ -93,14 +93,24 @@ Kafka resources are not applied until the Strimzi operator is healthy. Collector
 Deployments are not considered healthy until their dependent service endpoints
 and readiness probes are healthy.
 
+The existing `flink` Application is excluded from the root composition during
+this migration because its overlay does not exist and Flink is outside the
+approved scope. The file may remain as a future migration input, but Argo CD
+must not reconcile it until a separately approved Flink overlay exists.
+
 ### Configuration and secrets
 
 All data-service and collector credentials use SOPS-encrypted Secret manifests.
-The existing invalid secret composition is replaced with a renderable SOPS
-layout; raw encrypted Secret resources are decrypted by the Argo CD plugin and
-then applied. Naming is standardized so MySQL and collector workloads reference
-the same explicitly documented credential contract. Plaintext source manifests
-are not copied.
+The existing invalid secret composition is replaced with a KSOPS generator
+layout; the generator, rather than ordinary Kustomize `resources`, decrypts
+the encrypted Secret manifests inside the Argo CD plugin and then applies them.
+Naming is standardized so MySQL and collector workloads reference the same
+explicitly documented credential contract. Plaintext source manifests are not
+copied.
+
+The root Kustomization does not set a global namespace. Each resource declares
+its own namespace (or an individual overlay sets one), preventing a GitOps root
+render from rewriting `data` and `collectors` Secrets into `gitops`.
 
 ### Image ownership and supply chain
 

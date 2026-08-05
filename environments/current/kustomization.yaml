@@ -3,10 +3,10 @@ kind: Kustomization
 
 resources:
   - applications/gitops.yaml
+  - projects/platform.yaml
+  - applications/ingress.yaml
+  - applications/data-prerequisites.yaml
   - applications/data.yaml
-  - applications/flink.yaml
   - applications/collectors.yaml
   - applications/observability.yaml
-  - secrets/kustomization.yaml
-
-namespace: gitops
+  - secrets

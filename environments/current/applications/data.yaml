@@ -3,10 +3,12 @@ kind: Application
 metadata:
   name: data
   namespace: gitops
+  annotations:
+    argocd.argoproj.io/sync-wave: "-10"
 spec:
-  project: default
+  project: platform
   source:
-    repoURL: https://github.com/ad/big-data-platform-envs.git
+    repoURL: https://github.com/charleschen68/big-data-platform-envs.git
     targetRevision: HEAD
     path: environments/current/overlays/data
   destination:
@@ -18,3 +20,4 @@ spec:
       selfHeal: true
     syncOptions:
       - CreateNamespace=true
+      - ServerSideApply=true

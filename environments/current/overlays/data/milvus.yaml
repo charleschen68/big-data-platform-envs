@@ -1,0 +1,99 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: milvus
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: milvus
+  template:
+    metadata:
+      labels:
+        app: milvus
+    spec:
+      containers:
+        - name: milvus
+          image: milvusdb/milvus:v2.4.15
+          imagePullPolicy: IfNotPresent
+          command: [milvus, run, standalone]
+          ports:
+            - name: milvus
+              containerPort: 19530
+            - name: metrics
+              containerPort: 9091
+          env:
+            - name: MINIO_ADDRESS
+              value: minio.data.svc.cluster.local:9000
+            - name: MINIO_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: rootUser
+            - name: MINIO_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: minio-secrets
+                  key: rootPassword
+            - name: COMMON_STORAGETYPE
+              value: minio
+            - name: ETCD_USE_EMBED
+              value: "true"
+            - name: ETCD_DATA_DIR
+              value: /var/lib/milvus/etcd
+          resources:
+            requests:
+              cpu: "1"
+              memory: 2Gi
+            limits:
+              cpu: "4"
+              memory: 6Gi
+          volumeMounts:
+            - name: data
+              mountPath: /var/lib/milvus
+            - name: logs
+              mountPath: /milvus/logs
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: milvus-data
+        - name: logs
+          persistentVolumeClaim:
+            claimName: milvus-logs
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: milvus-data
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 20Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: milvus-logs
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: milvus
+spec:
+  selector:
+    app: milvus
+  ports:
+    - name: milvus
+      port: 19530
+      targetPort: milvus
+    - name: metrics
+      port: 9091
+      targetPort: metrics
