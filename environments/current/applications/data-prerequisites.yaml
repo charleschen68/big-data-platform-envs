@@ -23,6 +23,14 @@ spec:
           value: local-path
         - name: persistence.size
           value: 20Gi
+        - name: resources.requests.cpu
+          value: 250m
+        - name: resources.requests.memory
+          value: 512Mi
+        - name: resources.limits.cpu
+          value: "1"
+        - name: resources.limits.memory
+          value: 1Gi
   destination:
     server: https://kubernetes.default.svc
     namespace: data
