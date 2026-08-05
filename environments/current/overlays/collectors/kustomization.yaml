@@ -4,3 +4,4 @@ namespace: collectors
 resources:
   - configmap.yaml
   - external-services.yaml
+  - workloads.yaml

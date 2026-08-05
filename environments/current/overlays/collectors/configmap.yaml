@@ -8,6 +8,7 @@ data:
   RSS_CHECK_INTERVAL_SECONDS: "60"
   RSS_FEEDS: https://cointelegraph.com/rss,https://www.coindesk.com/arc/outboundfeeds/rss/,https://decrypt.co/feed
   MYSQL_HOST: mysql
+  MYSQL_USER: root
   MYSQL_DATABASE: trade
   MARKET_INTERVAL_SECONDS: "60"
   MILVUS_HOST: milvus

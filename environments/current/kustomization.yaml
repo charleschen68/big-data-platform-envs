@@ -6,6 +6,7 @@ resources:
   - projects/platform.yaml
   - applications/ingress.yaml
   - applications/secrets.yaml
+  - applications/collector-secrets.yaml
   - applications/data-prerequisites.yaml
   - applications/strimzi.yaml
   - applications/data.yaml

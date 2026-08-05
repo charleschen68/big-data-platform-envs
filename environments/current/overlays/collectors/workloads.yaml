@@ -1,0 +1,206 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: collector-artifacts
+spec:
+  accessModes: [ReadWriteOnce]
+  storageClassName: local-path
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rss-collector
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: rss-collector
+  template:
+    metadata:
+      labels:
+        app: rss-collector
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: rss-collector
+          image: big-data/rss-collector:phase2
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: collector-config
+          ports:
+            - name: health
+              containerPort: 8080
+          livenessProbe:
+            httpGet: {path: /live, port: health}
+          readinessProbe:
+            httpGet: {path: /ready, port: health}
+          resources:
+            requests: {cpu: 50m, memory: 64Mi}
+            limits: {cpu: 200m, memory: 192Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: market-collector
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: market-collector
+  template:
+    metadata:
+      labels:
+        app: market-collector
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: market-collector
+          image: big-data/market-collector:phase2
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: collector-config
+          env:
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: collector-secrets
+                  key: MYSQL_PASSWORD
+          ports:
+            - name: health
+              containerPort: 8080
+          livenessProbe:
+            httpGet: {path: /live, port: health}
+          readinessProbe:
+            httpGet: {path: /ready, port: health}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: settlement-worker
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: settlement-worker
+  template:
+    metadata:
+      labels:
+        app: settlement-worker
+    spec:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 10001
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: settlement-worker
+          image: big-data/settlement-worker:phase2
+          imagePullPolicy: Never
+          envFrom:
+            - configMapRef:
+                name: collector-config
+          ports:
+            - name: health
+              containerPort: 8080
+          livenessProbe:
+            httpGet: {path: /live, port: health}
+          readinessProbe:
+            httpGet: {path: /ready, port: health}
+          resources:
+            requests: {cpu: 100m, memory: 128Mi}
+            limits: {cpu: 500m, memory: 384Mi}
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: {drop: ["ALL"]}
+          volumeMounts:
+            - {name: tmp, mountPath: /tmp}
+      volumes:
+        - name: tmp
+          emptyDir: {}
+---
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: model-retrain
+spec:
+  schedule: "0 3 * * 0"
+  timeZone: Asia/Shanghai
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 2
+  failedJobsHistoryLimit: 3
+  jobTemplate:
+    spec:
+      backoffLimit: 1
+      activeDeadlineSeconds: 3600
+      template:
+        spec:
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 10001
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: model-retrain
+              image: big-data/model-retrain:phase2
+              imagePullPolicy: Never
+              envFrom:
+                - configMapRef:
+                    name: collector-config
+              resources:
+                requests: {cpu: 200m, memory: 256Mi}
+                limits: {cpu: "2", memory: 1Gi}
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities: {drop: ["ALL"]}
+              volumeMounts:
+                - {name: artifacts, mountPath: /artifacts}
+                - {name: tmp, mountPath: /tmp}
+          volumes:
+            - name: artifacts
+              persistentVolumeClaim:
+                claimName: collector-artifacts
+            - name: tmp
+              emptyDir: {}
