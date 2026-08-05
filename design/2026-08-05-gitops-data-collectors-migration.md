@@ -83,7 +83,8 @@ rendering and dependency checks pass:
 | Wave | Application | Responsibility |
 | --- | --- | --- |
 | -30 | `ingress` | Traefik controller and local IngressClass |
-| -20 | `data-prerequisites` | Strimzi operator and MinIO chart |
+| -20 | `minio` | MinIO chart and its persistent volume |
+| -20 | `strimzi` | Strimzi operator and Kafka CRDs |
 | -10 | `data` | Kafka CRs, MySQL, ClickHouse, Milvus, PVCs, and internal services |
 | 0 | `collectors` | ConfigMap, SOPS-managed credentials, service aliases, three collector Deployments, and retraining CronJob |
 | 10 | `observability` | Prometheus, Grafana, ServiceMonitors, dashboards, and local Ingresses |
@@ -92,6 +93,11 @@ If an earlier wave is unhealthy, later waves must not be reported as started.
 Kafka resources are not applied until the Strimzi operator is healthy. Collector
 Deployments are not considered healthy until their dependent service endpoints
 and readiness probes are healthy.
+
+`data` and `collectors` do not use automated sync for their first rollout.
+Their initial synchronization is an explicit operator action after the preceding
+application is `Synced` and `Healthy`. Automated reconciliation is retained for
+the non-stateful controllers and prerequisite applications.
 
 The existing `flink` Application is excluded from the root composition during
 this migration because its overlay does not exist and Flink is outside the
@@ -107,6 +113,11 @@ the encrypted Secret manifests inside the Argo CD plugin and then applies them.
 Naming is standardized so MySQL and collector workloads reference the same
 explicitly documented credential contract. Plaintext source manifests are not
 copied.
+
+The upstream KSOPS image does not include the `sops` executable. The local
+bootstrap builds the pinned ARM64 `big-data-platform/argocd-ksops-sops` CMP
+image from the upstream KSOPS image and an SHA-256-verified SOPS release. The
+image is a local-cluster bootstrap artifact; no secret is embedded in it.
 
 The root Kustomization does not set a global namespace. Each resource declares
 its own namespace (or an individual overlay sets one), preventing a GitOps root
@@ -141,6 +152,13 @@ check. The target uses one replica per stateful service and conservative,
 explicit requests and limits appropriate to the measured 15.7 GiB node. The
 rollout verifies scheduled Pod requests before each subsequent wave. This is
 not HA: loss of the node interrupts every component.
+
+The initial local profile reserves 512Mi for MinIO, 1Gi for the dual-role
+Kafka node, 512Mi for MySQL, 2Gi for ClickHouse, and 2Gi for Milvus. Kafka
+uses one KRaft `KafkaNodePool` replica with a 20Gi `local-path` claim and
+`deleteClaim: false`. Strimzi owns broker IDs, KRaft roles, listener protocol
+mapping, and generated bootstrap Services; hand-written `KAFKA_*` broker
+environment/configuration fields and ad-hoc bootstrap Services are excluded.
 
 ## Interfaces and data impact
 
