@@ -6,7 +6,7 @@ metadata:
     argocd.argoproj.io/tracking-id: data:apps/StatefulSet:data/clickhouse
 spec:
   serviceName: clickhouse
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: clickhouse

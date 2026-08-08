@@ -14,7 +14,7 @@ kind: Deployment
 metadata:
   name: rss-collector
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
@@ -62,7 +62,7 @@ kind: Deployment
 metadata:
   name: market-collector
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:
@@ -116,7 +116,7 @@ kind: Deployment
 metadata:
   name: settlement-worker
 spec:
-  replicas: 1
+  replicas: 0
   strategy:
     type: Recreate
   selector:

@@ -6,7 +6,7 @@ metadata:
     argocd.argoproj.io/tracking-id: data:apps/StatefulSet:data/mysql
 spec:
   serviceName: mysql
-  replicas: 1
+  replicas: 0
   selector:
     matchLabels:
       app: mysql
