@@ -10,17 +10,57 @@ spec:
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
     parallelism.default: "1"
+    taskmanager.rpc.port: "6122"
     kubernetes.rest-service.exposed.type: ClusterIP
   jobManager:
     resource:
       memory: "1024m"
       cpu: 0.5
     replicas: 1
+    podTemplate:
+      spec:
+        containers:
+          - name: flink-main-container
+            startupProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 10
+              failureThreshold: 30
+            readinessProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 10
+            livenessProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 20
+              failureThreshold: 6
   taskManager:
     resource:
       memory: "2048m"
       cpu: 1
     replicas: 1
+    podTemplate:
+      spec:
+        containers:
+          - name: flink-main-container
+            startupProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 10
+              failureThreshold: 30
+            readinessProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 10
+            livenessProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 20
+              failureThreshold: 6
   podTemplate:
     spec:
       securityContext:
