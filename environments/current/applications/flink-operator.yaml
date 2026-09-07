@@ -1,0 +1,40 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: flink-operator
+  namespace: gitops
+spec:
+  project: platform
+  source:
+    repoURL: https://archive.apache.org/dist/flink/flink-kubernetes-operator-1.9.0/
+    chart: flink-kubernetes-operator
+    targetRevision: 1.9.0
+    helm:
+      releaseName: flink-kubernetes-operator
+      values: |
+        watchNamespaces: [flink]
+        image:
+          repository: apache/flink-kubernetes-operator
+          tag: "1.9.0"
+          digest: sha256:d34d27a38774c76bb9c1988e9d57a391d074fe183b2492ef3e32423f90e16c2f
+        webhook:
+          create: false
+        operatorPod:
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+        operatorSecurityContext:
+          allowPrivilegeEscalation: false
+          capabilities:
+            drop: [ALL]
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: flink
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

@@ -14,3 +14,5 @@ resources:
   - applications/collectors.yaml
   - applications/monitoring.yaml
   - applications/observability.yaml
+  - applications/flink-operator.yaml
+  - applications/flink.yaml

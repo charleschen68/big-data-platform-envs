@@ -1,0 +1,35 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: flink-session
+  namespace: flink
+spec:
+  image: flink:1.18.1-scala_2.12-java17@sha256:44af270538aa97418be63d0f42b2f4400d12c5e41e58813f8b4b85d52fe27f5d
+  flinkVersion: v1_18
+  serviceAccount: flink
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    parallelism.default: "1"
+    kubernetes.rest-service.exposed.type: ClusterIP
+  jobManager:
+    resource:
+      memory: "1024m"
+      cpu: 0.5
+    replicas: 1
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+    replicas: 1
+  podTemplate:
+    spec:
+      securityContext:
+        runAsUser: 9999
+        runAsGroup: 9999
+        fsGroup: 9999
+      containers:
+        - name: flink-main-container
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]

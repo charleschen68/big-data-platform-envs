@@ -3,7 +3,7 @@
 The authoritative GitOps environment repository for `big-data-platform`.
 It declares the local OrbStack environment; the sibling application repository
 owns collector source code, Dockerfiles, and image builds. Do not apply its
-legacy `infra/k8s/{data,collectors}` manifests directly.
+legacy `infra/k8s/{data,collectors,flink}` manifests directly.
 
 ## Current environment
 
@@ -15,8 +15,9 @@ legacy `infra/k8s/{data,collectors}` manifests directly.
 | `collectors` | RSS, market, settlement, safe Milvus schema-init, retraining CronJob |
 | `observability` | Prometheus, Grafana, collector ServiceMonitors and dashboard |
 
-Flink and Velero are outside the current migration scope and must not be
-assumed deployed.
+Flink 1.18.1 session runtime is declared in `overlays/flink` with a separate
+Operator Application. Business jobs are not yet migrated. Velero remains outside
+the current migration scope. See [Flink rollout](wiki/flink-runbook.md).
 
 ## Bootstrap and access
 
