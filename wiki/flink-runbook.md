@@ -49,4 +49,16 @@ sink idempotency, checkpoints and savepoint restoration before cutover.
 
 Root and runtime Kustomize rendering, official Operator chart rendering, root
 and Operator client validation, and whitespace checks passed. Runtime server
-validation and live acceptance are pending deployment.
+validation passed. Live REST reported flink-version 1.18.1 (commit a8c8b1c),
+one TaskManager and two available slots. Operator, JobManager and TaskManager
+were Ready with zero restarts; FlinkDeployment reached STABLE / READY.
+Bundled WordCount completed with FINISHED, two finished tasks, no failed tasks,
+JobID 7555b3465d9dc7fa5dbbf4971863c353, runtime 5095 ms. Its CLI printed a
+Log4j reconfiguration warning; job execution succeeded. No business jobs were
+submitted and durable-state recovery has not been validated.
+
+The first native session was verified empty (`jobs: []`) and retired through
+GitOps before standalone creation because mode changes are not supported in
+place. Explicit sync requests must include CreateNamespace=true and
+ServerSideApply=true. CRD defaulting differences are compared using Argo CD
+ServerSideDiff; no schema paths are ignored.
