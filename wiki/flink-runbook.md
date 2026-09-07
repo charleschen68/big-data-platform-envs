@@ -62,3 +62,9 @@ GitOps before standalone creation because mode changes are not supported in
 place. Explicit sync requests must include CreateNamespace=true and
 ServerSideApply=true. CRD defaulting differences are compared using Argo CD
 ServerSideDiff; no schema paths are ignored.
+
+## Approved job scope (2026-09-07)
+
+Only `eth-sentiment-trading-job` is selected for migration. The other four
+modules are retired and must not be migrated. See
+[the scope decision](../design/2026-09-07-flink-job-scope.md).

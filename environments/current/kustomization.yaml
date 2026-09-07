@@ -16,3 +16,4 @@ resources:
   - applications/observability.yaml
   - applications/flink-operator.yaml
   - applications/flink.yaml
+  - applications/flink-secrets.yaml

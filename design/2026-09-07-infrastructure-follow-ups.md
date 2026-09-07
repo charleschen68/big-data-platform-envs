@@ -17,3 +17,9 @@ repository owner. These are prioritized findings, not completed improvements.
 
 Changes to availability, backups and branch ownership require their own design,
 rollout and rollback review. Runtime REST health alone is not job acceptance.
+
+## Approved job scope (2026-09-07)
+
+Only `eth-sentiment-trading-job` is selected for migration. The other four
+modules are retired and must not be migrated. See
+[the scope decision](2026-09-07-flink-job-scope.md).

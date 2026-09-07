@@ -58,3 +58,7 @@ For a validated operational procedure and the evidence/rollback boundaries, see
 [the GitOps migration runbook](wiki/2026-08-05-gitops-data-collectors-runbook.md).
 The durable architecture decision is recorded in
 [the migration design](design/2026-08-05-gitops-data-collectors-migration.md).
+
+Flink business-job scope: only `eth-sentiment-trading-job` is selected.
+The other four legacy modules are retired and will not migrate. See
+[the approved scope](design/2026-09-07-flink-job-scope.md).
