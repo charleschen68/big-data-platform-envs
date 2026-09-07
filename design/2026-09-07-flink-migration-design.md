@@ -10,7 +10,7 @@ Legacy job images are not runnable Flink distributions and are excluded until re
 
 ## Decision
 Install the official Operator 1.9.0 chart and its structural CRDs in a separate
-manual-sync Application, scoped to namespace flink. Deploy a session cluster
+manual-sync Application, scoped to namespace flink. Deploy a standalone session cluster
 through a second manual-sync Application. This is runtime infrastructure only;
 five legacy application jobs require separate image and state acceptance.
 Disable the chart webhook for this local environment because cert-manager is absent;
@@ -28,7 +28,8 @@ not configured for durable job recovery; no business job may be migrated until
 SOPS-protected S3 access, checkpoint/savepoint storage and restore are verified.
 
 ## Operational Impact
-One Operator, one JobManager and one TaskManager; two task slots.
+One Operator, one JobManager and one resident TaskManager; two task slots.
+Standalone mode makes taskManager.replicas effective even without submitted jobs.
 No existing consumer groups or sinks are activated by this runtime deployment.
 
 ## Ownership

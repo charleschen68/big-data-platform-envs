@@ -6,6 +6,7 @@ metadata:
 spec:
   image: flink:1.18.1-scala_2.12-java17@sha256:44af270538aa97418be63d0f42b2f4400d12c5e41e58813f8b4b85d52fe27f5d
   flinkVersion: v1_18
+  mode: standalone
   serviceAccount: flink
   flinkConfiguration:
     taskmanager.numberOfTaskSlots: "2"
