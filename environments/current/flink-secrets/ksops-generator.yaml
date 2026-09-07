@@ -1,0 +1,6 @@
+apiVersion: viaduct.ai/v1
+kind: ksops
+metadata:
+  name: flink-state-secrets
+files:
+  - flink-state-secrets.yaml

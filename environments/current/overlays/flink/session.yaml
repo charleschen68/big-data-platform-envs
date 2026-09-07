@@ -1,0 +1,105 @@
+apiVersion: flink.apache.org/v1beta1
+kind: FlinkDeployment
+metadata:
+  name: flink-session
+  namespace: flink
+spec:
+  image: flink:1.18.1-scala_2.12-java17@sha256:44af270538aa97418be63d0f42b2f4400d12c5e41e58813f8b4b85d52fe27f5d
+  flinkVersion: v1_18
+  mode: standalone
+  serviceAccount: flink
+  flinkConfiguration:
+    taskmanager.numberOfTaskSlots: "2"
+    parallelism.default: "1"
+    state.backend: hashmap
+    state.checkpoint-storage: filesystem
+    state.checkpoints.dir: s3://flink-state/session/checkpoints
+    state.savepoints.dir: s3://flink-state/session/savepoints
+    state.checkpoints.num-retained: "3"
+    execution.checkpointing.interval: "30 s"
+    execution.checkpointing.timeout: "120 s"
+    execution.checkpointing.min-pause: "10 s"
+    execution.checkpointing.externalized-checkpoint-retention: RETAIN_ON_CANCELLATION
+    high-availability: org.apache.flink.kubernetes.highavailability.KubernetesHaServicesFactory
+    high-availability.storageDir: s3://flink-state/session/ha
+    s3.endpoint: http://minio.data.svc.cluster.local:9000
+    s3.path.style.access: "true"
+    restart-strategy: fixed-delay
+    restart-strategy.fixed-delay.attempts: "3"
+    restart-strategy.fixed-delay.delay: "10 s"
+    taskmanager.rpc.port: "6122"
+    kubernetes.rest-service.exposed.type: ClusterIP
+  jobManager:
+    resource:
+      memory: "1024m"
+      cpu: 0.5
+    replicas: 1
+    podTemplate:
+      spec:
+        containers:
+          - name: flink-main-container
+            startupProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 10
+              failureThreshold: 30
+            readinessProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 10
+            livenessProbe:
+              httpGet:
+                path: /overview
+                port: 8081
+              periodSeconds: 20
+              failureThreshold: 6
+  taskManager:
+    resource:
+      memory: "2048m"
+      cpu: 1
+    replicas: 1
+    podTemplate:
+      spec:
+        containers:
+          - name: flink-main-container
+            startupProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 10
+              failureThreshold: 30
+            readinessProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 10
+            livenessProbe:
+              tcpSocket:
+                port: 6122
+              periodSeconds: 20
+              failureThreshold: 6
+  podTemplate:
+    spec:
+      securityContext:
+        runAsUser: 9999
+        runAsGroup: 9999
+        fsGroup: 9999
+      containers:
+        - name: flink-main-container
+          env:
+            - name: ENABLE_BUILT_IN_PLUGINS
+              value: flink-s3-fs-presto-1.18.1.jar
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom:
+                secretKeyRef:
+                  name: flink-state-secrets
+                  key: AWS_ACCESS_KEY_ID
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: flink-state-secrets
+                  key: AWS_SECRET_ACCESS_KEY
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: [ALL]

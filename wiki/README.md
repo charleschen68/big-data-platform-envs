@@ -25,3 +25,5 @@ to expose plaintext secrets.
 ## Current runbooks
 
 - [GitOps data and collectors operating runbook](2026-08-05-gitops-data-collectors-runbook.md)
+
+- [Flink runtime rollout and acceptance](flink-runbook.md)

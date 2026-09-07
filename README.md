@@ -3,7 +3,7 @@
 The authoritative GitOps environment repository for `big-data-platform`.
 It declares the local OrbStack environment; the sibling application repository
 owns collector source code, Dockerfiles, and image builds. Do not apply its
-legacy `infra/k8s/{data,collectors}` manifests directly.
+legacy `infra/k8s/{data,collectors,flink}` manifests directly.
 
 ## Current environment
 
@@ -15,8 +15,9 @@ legacy `infra/k8s/{data,collectors}` manifests directly.
 | `collectors` | RSS, market, settlement, safe Milvus schema-init, retraining CronJob |
 | `observability` | Prometheus, Grafana, collector ServiceMonitors and dashboard |
 
-Flink and Velero are outside the current migration scope and must not be
-assumed deployed.
+Flink 1.18.1 session runtime is declared in `overlays/flink` with a separate
+Operator Application. Business jobs are not yet migrated. Velero remains outside
+the current migration scope. See [Flink rollout](wiki/flink-runbook.md).
 
 ## Bootstrap and access
 
@@ -57,3 +58,11 @@ For a validated operational procedure and the evidence/rollback boundaries, see
 [the GitOps migration runbook](wiki/2026-08-05-gitops-data-collectors-runbook.md).
 The durable architecture decision is recorded in
 [the migration design](design/2026-08-05-gitops-data-collectors-migration.md).
+
+Flink business-job scope: only `eth-sentiment-trading-job` is selected.
+The other four legacy modules are retired and will not migrate. See
+[the approved scope](design/2026-09-07-flink-job-scope.md).
+
+Flink state uses MinIO with SOPS credentials and Kubernetes HA. Synthetic
+TaskManager/JobManager recovery and savepoint restore passed; business-job
+migration remains gated on model selection and application acceptance.
