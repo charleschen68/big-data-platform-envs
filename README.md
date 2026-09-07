@@ -62,3 +62,7 @@ The durable architecture decision is recorded in
 Flink business-job scope: only `eth-sentiment-trading-job` is selected.
 The other four legacy modules are retired and will not migrate. See
 [the approved scope](design/2026-09-07-flink-job-scope.md).
+
+Flink state uses MinIO with SOPS credentials and Kubernetes HA. Synthetic
+TaskManager/JobManager recovery and savepoint restore passed; business-job
+migration remains gated on model selection and application acceptance.

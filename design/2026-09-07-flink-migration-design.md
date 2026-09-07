@@ -23,9 +23,9 @@ Copying the legacy permissive CRDs and Operator image into jobs is invalid.
 Direct kubectl deployment would create a second source of truth.
 
 ## Assumptions
-Single-node local development, no availability guarantee. Session storage is
-not configured for durable job recovery; no business job may be migrated until
-SOPS-protected S3 access, checkpoint/savepoint storage and restore are verified.
+Single-node local development, no availability guarantee. S3 checkpoint/savepoint storage and Kubernetes HA process recovery were added
+and synthetically verified later on 2026-09-07; see the persistent-state design.
+Business cutover remains gated on its own correctness and dependency acceptance.
 
 ## Operational Impact
 One Operator, one JobManager and one resident TaskManager; two task slots.

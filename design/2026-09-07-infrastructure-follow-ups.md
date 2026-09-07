@@ -5,8 +5,8 @@ repository owner. These are prioritized findings, not completed improvements.
 
 | Priority | Finding | Acceptance criterion |
 | --- | --- | --- |
-| P0 | Five legacy Flink jobs lack runnable images and valid manifests | Reproducible 1.18.1 images with required connectors, per-job config, checkpoint and restore evidence before cutover |
-| P0 | New session runtime has no durable state or HA recovery | SOPS-managed least-privilege S3 credentials, verified buckets, checkpoints, savepoint restore and source/sink reconciliation |
+| P0 | Selected trading job lacks a verified application image; four other jobs retired | Reproducible 1.18.1 trading image, approved models, error handling, connector and end-to-end recovery acceptance before cutover |
+| P0 | Synthetic S3 checkpoint/savepoint and process HA recovery passed; business recovery remains unverified | Complete selected-job source/sink reconciliation and off-node backup/restore; retain evidence |
 | P1 | Live GitOps follows feat/gitops-data-collectors while local main has extra replica edits | Review rendered differences and consolidate source branch without unintended scale changes |
 | P1 | No repository CI workflow | Render every child overlay, Helm charts and CRD schemas; policy and secret checks on PRs |
 | P1 | Single-node local-path storage and single Kafka replica | Explicit local-only availability contract; tested off-node backup and restore, measured RPO/RTO |

@@ -25,10 +25,9 @@ local-only. No ingress or public REST endpoint is declared.
 ## Failure and recovery
 
 ImagePullBackOff: verify digest and registry connectivity. Reconciliation errors:
-inspect Operator logs and FlinkDeployment status. A session runtime is not HA;
-node or JobManager loss may lose submitted jobs. Do not submit stateful business
-jobs until S3 credentials are SOPS-encrypted in namespace flink, buckets exist,
-checkpoint completion and restoration are verified, and connectors are packaged.
+inspect Operator logs and FlinkDeployment status. JobManager process recovery now uses Kubernetes HA metadata and S3 state.
+Single-node loss remains outside the recovery guarantee. Business jobs still
+require packaged connectors, approved models and end-to-end recovery acceptance.
 
 Before any jobs exist, revert the session declaration and explicitly sync its
 removal. Keep CRDs and Operator while Flink resources exist. Once jobs exist,
@@ -38,12 +37,13 @@ failed state recovery.
 
 ## Business-job migration blockers
 
-All five legacy manifests point to an Operator image, use invalid schema fields,
-and lack verified application images. Four Dockerfiles use a suspect base digest
-and inconsistent COPY paths; the trading image contains Java and a JAR but no
-Flink installation. Repair these in the application repository, include provided
-Kafka/JDBC connectors, then verify each job's configuration, source offsets,
-sink idempotency, checkpoints and savepoint restoration before cutover.
+Only eth-sentiment-trading-job remains in migration scope; the other four are
+retired. Its old image contains Java and a JAR but no Flink installation. Package
+the required connectors and verify the selected job's configuration, source
+offsets, sink idempotency and recovery before cutover. Its hardcoded sentiment
+and embedding models were absent from the live model inventory on 2026-09-07;
+model and endpoint selection is awaiting the owner. Existing async functions
+can drop records on failures, and Milvus writes need replay/idempotency review.
 
 ## Validation evidence (2026-09-07)
 
@@ -68,3 +68,32 @@ ServerSideDiff; no schema paths are ignored.
 Only `eth-sentiment-trading-job` is selected for migration. The other four
 modules are retired and must not be migrated. See
 [the scope decision](../design/2026-09-07-flink-job-scope.md).
+
+## Persistent state acceptance (2026-09-07)
+
+Storage: bucket `flink-state`, scoped MinIO account `flink-state-runtime`,
+SOPS Secret `flink-state-secrets` in namespace flink. The runtime uses the bundled
+S3 Presto 1.18.1 plugin, retained externalized checkpoints and Kubernetes HA.
+Account provisioning created only the new bucket/account/policy; no root
+credential is passed to Flink. Preserve these resources during rollback.
+
+Synthetic acceptance source: `scripts/flink-recovery/CounterRecovery.java`.
+The independent source and keyed counters must match; a mismatch fails the job.
+
+- Initial job: `66379a01cc6041fff7cda2e127db6fe2`.
+- TaskManager recreation restored checkpoint 4; source counter resumed at 777.
+- JobManager recreation recovered the same JobID from checkpoint 6, followed by
+  further completed checkpoints with no checkpoint failures in the observation.
+- Stop-with-savepoint produced
+  `s3://flink-state/session/savepoints/savepoint-66379a-7673ea491971`.
+- New job `dbaf2670d3f2f22f7e763ebaaa7fc10d` restored that exact path with
+  `is_savepoint=true`, resumed at 4210, and completed six subsequent checkpoints
+  with zero checkpoint failures at the acceptance observation.
+- The CLI printed a Log4j configuration warning and one asynchronous Fabric8
+  closed-classloader exception during client shutdown after submission. The
+  server-side job remained RUNNING and checkpointing. Do not disable classloader
+  checks; track client lifecycle separately from runtime state acceptance.
+
+These are process-failure and explicit savepoint-restore tests on local MinIO.
+No off-node backup, total-node-loss recovery, Kafka offset cutover or business
+sink exactly-once guarantee has been validated.
